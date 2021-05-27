@@ -1,0 +1,16 @@
+function []= avgplot(array,color,start)
+    mu = mean(array,1);
+    sig = std(array,1,1);
+     
+    x=[1:size(array,2)];
+    figure;
+shadedErrorBar(x,mu, sig,'lineprops',{'Color',color},'transparent',1);
+    hold on;
+    line([start start], [-10 10],'LineStyle','--','LineWidth',2,'Color','k'); 
+    ylabel('avg zscore');
+    xlabel('time(s)')
+    xticks(1:start*5:size(array,2))
+    xticklabels(num2cell([-start:start:(size(array,2)]-start*5)/5))
+% % ylim([-1 1])
+% xlim([0 (bef+aft)])
+end
