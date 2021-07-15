@@ -1,9 +1,8 @@
-function []= avgplot(array,color,start)
+function []= avgplot_2(array,color,start)
     mu = mean(array,1);
     sig = std(array,1,1);
      
     x=[1:size(array,2)];
-    figure;
     shadedErrorBar(x,mu, sig,'lineprops',{'Color',color},'transparent',1);
     hold on;
     line([start start], [floor(min(mu)-min(sig)-1) ceil(max(mu)+max(sig)+1)],'LineStyle','--','LineWidth',1,'Color','k'); 
