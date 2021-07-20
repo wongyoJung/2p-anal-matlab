@@ -8,7 +8,7 @@ firstLick_1 = floor(180*5);
 firstLick_2 = floor(300*5);
 
 % bef = 3*60*5;
-bef = 1*5*30;
+bef = 2*5*60;
 aft = 5*60*10;
 % aft = 5*60*5; .
 Data_1_active=[]
@@ -167,9 +167,9 @@ for j=1:size(zscore_aligned_1,1)
     empty_2(sorted_ind,:)=cell_2;
 end
 drawHM_aligned(empty_1,'zscore',bef,aft);
-title('G1-5-fed-Lglu-T');
+title('Dglu');
 drawHM_aligned(empty_2,'zscore',bef,aft);
-title('T2');
+title('Lglu');
 
 
 %% classify inh/act/nores
@@ -225,6 +225,16 @@ drawpie(ses2_act,ses2_inh,ses2_nores);
 avgplot(ses2_act,act_color,bef);
 avgplot(ses2_inh,inh_color,bef);
 avgplot(ses2_nores,no_res_color,bef);
+
+
+
+[ses2_act, ses2_inh, ses2_nores] = getResponsive(empty_1,bef);
+drawpie(ses2_act,ses2_inh,ses2_nores);
+avgplot(ses2_act,act_color,bef);
+avgplot(ses2_inh,inh_color,bef);
+avgplot(ses2_nores,no_res_color,bef);
+
+
 
 
 

@@ -15,8 +15,8 @@ firstlicks=[]
 
 
 % bef = 3*60*5;
-bef = 5*30;
-aft = 5*60*3;
+bef = 2*30*5;
+aft = 10*60*5;
 % aft = 5*60*5;
 
 %% pick common active cells
@@ -25,20 +25,56 @@ firstLicks=floor(firstlicks*5);
 [zscore_1,zscore_norm_1] = zscoredraw(Data_1,bef,firstLicks(1));
 zscore_aligned_1 = alignFirstLick(zscore_1,firstLicks(1),bef,aft);
 
-[zscore_2,zscore_norm_1] = zscoredraw(Data_2,bef,firstLicks(2));
+[zscore_2,zscore_norm_2] = zscoredraw(Data_2,bef,firstLicks(2));
 zscore_aligned_2 = alignFirstLick(zscore_2,firstLicks(2),bef,aft);
 
-[zscore_3,zscore_norm_1] = zscoredraw(Data_3,bef,firstLicks(3));
+[zscore_3,zscore_norm_3] = zscoredraw(Data_3,bef,firstLicks(3));
 zscore_aligned_3 = alignFirstLick(zscore_3,firstLicks(3),bef,aft);
 
-[zscore_4,zscore_norm_1] = zscoredraw(Data_4,bef,firstLicks(4));
+[zscore_4,zscore_norm_4] = zscoredraw(Data_4,bef,firstLicks(4));
 zscore_aligned_4 = alignFirstLick(zscore_4,firstLicks(4),bef,aft);
 
-[zscore_5,zscore_norm_1] = zscoredraw(Data_5,bef,firstLicks(5));
+[zscore_5,zscore_norm_5] = zscoredraw(Data_5,bef,firstLicks(5));
 zscore_aligned_5 = alignFirstLick(zscore_5,firstLicks(5),bef,aft);
 
 [zscore_6,zscore_norm_1] = zscoredraw(Data_6,bef,firstLicks(6));
 zscore_aligned_6 = alignFirstLick(zscore_6,firstLicks(6),bef,aft);
+
+
+
+Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5];
+Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6];
+
+drawHM_aligned(Data_SA,'zscore',bef,aft);
+title('SA');
+
+drawHM_aligned(Data_SO,'zscore',bef,aft);
+title('SO');
+
+
+
+
+
+%% pick common active cells (norm)
+firstLicks=floor(firstlicks*5);
+
+[zscore_1,zscore_norm_1] = zscoredraw(Data_1,bef,firstLicks(1));
+zscore_aligned_1 = alignFirstLick(zscore_norm_1,firstLicks(1),bef,aft);
+
+[zscore_2,zscore_norm_2] = zscoredraw(Data_2,bef,firstLicks(2));
+zscore_aligned_2 = alignFirstLick(zscore_norm_2,firstLicks(2),bef,aft);
+
+[zscore_3,zscore_norm_3] = zscoredraw(Data_3,bef,firstLicks(3));
+zscore_aligned_3 = alignFirstLick(zscore_norm_3,firstLicks(3),bef,aft);
+
+[zscore_4,zscore_norm_4] = zscoredraw(Data_4,bef,firstLicks(4));
+zscore_aligned_4 = alignFirstLick(zscore_norm_4,firstLicks(4),bef,aft);
+
+[zscore_5,zscore_norm_5] = zscoredraw(Data_5,bef,firstLicks(5));
+zscore_aligned_5 = alignFirstLick(zscore_norm_5,firstLicks(5),bef,aft);
+
+[zscore_6,zscore_norm_6] = zscoredraw(Data_6,bef,firstLicks(6));
+zscore_aligned_6 = alignFirstLick(zscore_norm_6,firstLicks(6),bef,aft);
 
 
 
@@ -127,18 +163,17 @@ for x=1:size(Data_SO,1)
     comp = [meanZ meanZ_SA];
     comparison=[comparison; comp];
 end
-figure;
-%  
-% b1 = comp_SO\comp_SA;
-% yCalc1 = b1*comp_SO;
+ %  
+b1 = comp_SO\comp_SA;
+yCalc1 = b1*comp_SO;
 figure;
  scatter(comp_SO,comp_SA,'k')
  xlabel("sucrose");
  ylabel("sucralose");
 % 
-% hold on
-% plot(comp_SO,yCalc1)
-% Rsq1 = 1 - sum((comp_SA - yCalc1).^2)/sum((comp_SA - mean(comp_SA)).^2)
+hold on
+plot(comp_SO,yCalc1)
+Rsq1 = 1 - sum((comp_SA - yCalc1).^2)/sum((comp_SA - mean(comp_SA)).^2)
 
 %% scatter plot 
 comparison=[]
@@ -411,5 +446,40 @@ figure;
 Y_tsne = tsne(norm_X);
 gscatter(Y_tsne(:,1),Y_tsne(:,2),Y)
 
+%% classifier using decoder
+Data_mice_1 = [zscore_aligned_1; zscore_aligned_2];
+y_label_1 = [ones(1,size(zscore_aligned_1,1)) zeros(1,size(zscore_aligned_2,1))];
+res_1 = Data_mice_1(:,bef:end);
+Data_mice_1_label=[res_1'; y_label_1];
+
+Data_mice_2 = [zscore_aligned_3; zscore_aligned_4];
+y_label_2 = [ones(1,size(zscore_aligned_3,1)) zeros(1,size(zscore_aligned_4,1))];
+res_2 = Data_mice_2(:,bef:end);
+Data_mice_2_label=[res_2'; y_label_2];
+
+Data_mice_3 = [zscore_aligned_5; zscore_aligned_6];
+y_label_3 = [ones(1,size(zscore_aligned_5,1)) zeros(1,size(zscore_aligned_6,1))];
+res_3 = Data_mice_3(:,bef:end);
+Data_mice_3_label=[res_3'; y_label_3];
+
+
+
+% shuffled data
+y_label_shuffle_id = randsample(size(zscore_aligned_1,1)+size(zscore_aligned_2,1),size(zscore_aligned_1,1));
+z = zeros(1,size(zscore_aligned_1,1)+size(zscore_aligned_2,1));
+z(y_label_shuffle_id)=1;
+Data_mice_1_shuffled =[res_1'; z];
+
+y_label_shuffle_id = randsample(size(zscore_aligned_3,1)+size(zscore_aligned_4,1),size(zscore_aligned_4,1));
+z = zeros(1,size(zscore_aligned_3,1)+size(zscore_aligned_4,1));
+z(y_label_shuffle_id)=1;
+
+Data_mice_2_shuffled =[res_2'; z];
+
+y_label_shuffle_id = randsample(size(zscore_aligned_5,1)+size(zscore_aligned_6,1),size(zscore_aligned_6,1));
+z = zeros(1,size(zscore_aligned_5,1)+size(zscore_aligned_6,1));
+z(y_label_shuffle_id)=1;
+
+Data_mice_3_shuffled =[res_3'; z];
 
 

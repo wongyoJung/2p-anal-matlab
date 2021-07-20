@@ -4,8 +4,9 @@ clust_inh=[];
 clust_nores=[];
 
 for k=1:size(data,1)
+    
     cell = data(k,:);
- 
+%  figure; plot(cell);
     res = cell(:,bef:end);
     m = mean(res);
     if(m>1)

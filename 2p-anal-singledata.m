@@ -2,9 +2,9 @@
 Data_1_active=[]
 
 %% 
-firstLick_1 = floor(400*5);
-bef = 1*5*30;
-aft = 5*60*5;
+firstLick_1 = floor(260*5);
+bef = 2*5*30;
+aft = 5*60*10;
 %% get z score and draw individual heatplot map 
 [zscore_1,zscore_norm_1] = zscoredraw(Data_1_active,bef,firstLick_1);
 zscore_aligned_1 = alignFirstLick(zscore_1,firstLick_1,bef,aft);
