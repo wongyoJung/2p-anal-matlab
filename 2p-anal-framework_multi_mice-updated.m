@@ -19,7 +19,7 @@ firstlicks=[]
 
 % bef = 3*60*5;
 bef = 5*60*2;
-aft = 5*60*10;
+aft = 5*60*11;
 % aft = 5*60*5;
 
 %% pick common active cells
@@ -94,12 +94,17 @@ Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5];
 Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6];
 
 drawHM_aligned(Data_SA,'zscore',bef,aft);
-title('Lipid');
+title('L-glucose');
 
 drawHM_aligned(Data_SO,'zscore',bef,aft);
-title('Dglu');
+title('D-glucose');
 
 %% divide into k means
+sortKmeans_multi_eval(Data_SO,Data_SA,bef,aft);
+
+%% divid according to resp
+getResponsiveSort(Data_SO,Data_SA,bef);
+%%
 
 [zscore_aligned_1_sorted,clust1_1,clust2_1,clust3_1,idx_1] = sortKmeans_multi(Data_SO,bef);
 sorted=[];
@@ -149,7 +154,7 @@ end
 drawHM_aligned(empty_1,'zscore',bef,aft);
 title('Fasted D glucose');
 drawHM_aligned(empty_2,'zscore',bef,aft);
-title('Fasted Lglucose');
+title('Fasted Protein');
 
 %% compare two sessions
 comparison=[]
@@ -385,36 +390,58 @@ avgplot_2(clust2_2,act_color,bef)
 hold on
 avgplot_2(clust3_2,inh_color,bef)
 
-[clust_act,clust_inh,clust_no_res] = responsiveCell(Data_SO,bef,aft);
-if(length(clust_act))
-    avgplot(clust_act,act_color,bef)
+
+%% draw pie chart from data 1
+[ses1_act, ses1_inh, ses1_nores] = getResponsive(empty_1,bef);
+if(length(ses1_act))
+    avgplot(ses1_act,act_color,bef)
 end
-if(length(clust_inh))
-    avgplot(clust_inh,inh_color,bef)
+if(length(ses1_inh))
+    avgplot(ses1_inh,inh_color,bef)
 end
-if(length(clust_no_res))
-    avgplot(clust_no_res,no_res_color,bef)
+if(length(ses1_nores))
+    avgplot(ses1_nores,no_res_color,bef)
+end
+drawHM_aligned(ses1_act,'zscore',bef,aft);
+drawHM_aligned(ses1_nores,'zscore',bef,aft);
+drawHM_aligned(ses1_inh,'zscore',bef,aft);
+
+
+
+
+
+
+%% draw pie chart from data 2
+
+[ses2_act, ses2_inh, ses2_nores] = getResponsive(empty_2,bef);
+if(length(ses2_act))
+    avgplot(ses2_act,act_color,bef)
+end
+if(length(ses2_inh))
+    avgplot(ses2_inh,inh_color,bef)
+end
+if(length(ses2_nores))
+    avgplot(ses2_nores,no_res_color,bef)
 end
 
-%% draw pie chart
-drawpie(clust_act,clust_inh,clust_no_res);
-%%
+drawpie(ses2_act,ses2_inh,ses2_nores);
 
-[clust_act,clust_inh,clust_no_res] = responsiveCell(Data_SA,bef,aft);
-if(length(clust_act))
-    avgplot(clust_act,act_color,bef)
+
+%% draw response type from data 1 and data 2
+
+[ses2_act, ses2_inh, ses2_nores] = getResponsive(empty_2,bef);
+if(length(ses2_act))
+    avgplot(ses2_act,act_color,bef)
 end
-if(length(clust_inh))
-    avgplot(clust_inh,inh_color,bef)
+if(length(ses2_inh))
+    avgplot(ses2_inh,inh_color,bef)
 end
-if(length(clust_no_res))
-    avgplot(clust_no_res,no_res_color,bef)
+if(length(ses2_nores))
+    avgplot(ses2_nores,no_res_color,bef)
 end
 
-%% draw pie chart
-drawpie(clust_act,clust_inh,clust_no_res);
-
-%%
+drawpie(ses2_act,ses2_inh,ses2_nores);
+%% get common cells : data1_inhibited and data2_activated
 SO_inh=[]
 SO_act=[]
 SO_nores=[]
@@ -422,7 +449,6 @@ SO_nores=[]
 SO_inh_match=[]
 SO_act_match=[]
 SO_nores_match=[]
-
 
 
 for c = 1:size(Data_SO,1)
@@ -445,25 +471,20 @@ for c = 1:size(Data_SO,1)
     end
 end
 
- 
 
 
-clust_act=[]
-clust_inh=[]
-clust_no_res=[]
-[clust_act,clust_inh,clust_no_res] = responsiveCell(SO_inh_match,bef,aft);
-if(length(clust_act))
-    avgplot(clust_act,act_color,bef)
+[data1_inh_data2_act, data1_inh_data2_inh, data1_inh_data2_nores] = getResponsive(SO_inh_match,bef);
+if(length(data1_inh_data2_act))
+    avgplot(data1_inh_data2_act,act_color,bef)
 end
-if(length(clust_inh))
-    avgplot(clust_inh,inh_color,bef)
+if(length(data1_inh_data2_inh))
+    avgplot(data1_inh_data2_inh,inh_color,bef)
 end
-if(length(clust_no_res))
-    avgplot(clust_no_res,no_res_color,bef)
+if(length(data1_inh_data2_nores))
+    avgplot(data1_inh_data2_nores,no_res_color,bef)
 end
+drawpie(data1_inh_data2_act, data1_inh_data2_inh, data1_inh_data2_nores);
 
-%% draw pie chart
-drawpie(clust_act,clust_inh,clust_no_res);
 
 
 %% normalize
@@ -520,13 +541,95 @@ figure;
 scatter3(Y_SO(:,1),Y_SO(:,2),Y_SO(:,3),'red')
 hold on;
 scatter3(Y_SA(:,1),Y_SA(:,2),Y_SA(:,3),'blue')
-legend('Dglu','Lipid');
+legend('Dglu','L-glu');
 xlabel("1st principle axis");ylabel("2nd principle axis");zlabel("3rd principle axis");
 
 %% T-SNE
 figure;
 Y_tsne = tsne(norm_X);
 gscatter(Y_tsne(:,1),Y_tsne(:,2),Y)
+
+%% linear correlation
+comparison=[]
+comp_1=[];
+comp_2=[];
+
+comp_1_inh=[];
+comp_1_inh_2=[];
+comp_2_act=[];
+comp_2_act_1=[];
+biphasic_1=[];
+biphasic_2=[];
+
+for x=1:size(empty_1,1)
+    rowcell = empty_1(x,:);
+    baseline = rowcell(1:bef);
+    res = rowcell(bef:end);
+%     mu = mean(baseline);
+%     sig = std(baseline);
+%     meanZ = mean((res-mu)/sig);
+        meanZ = mean(res);
+
+     rowcell_2 = empty_2(x,:);
+    baseline_2 = rowcell_2(1:bef);
+    res_2 = rowcell_2(aft-60*5:aft);
+    mu_2 = mean(baseline_2);
+    sig_2 = std(baseline_2);
+    meanZ_2 = mean((res_2-mu_2)/sig_2);
+            meanZ_2 = mean(res_2);
+
+            
+   if(meanZ<-1 & meanZ_2>1)
+       biphasic_1=[biphasic_1; meanZ];
+       biphasic_2=[biphasic_2; meanZ_2];
+   
+   elseif(meanZ<-1)
+       comp_1_inh=[comp_1_inh; meanZ];
+       comp_1_inh_2=[comp_1_inh_2; meanZ_2];
+   
+  elseif(meanZ_2>1)
+       comp_2_act=[comp_2_act; meanZ_2];
+       comp_2_act_1=[comp_2_act_1; meanZ];
+   else
+   comp_1=[comp_1; meanZ];
+    comp_2=[comp_2; meanZ_2];
+   end
+
+    comp = [meanZ meanZ_2];
+    comparison=[comparison; comp];
+end
+figure;
+ scatter(comp_1,comp_2,'o','MarkerEdgeColor',[64, 64, 64]/255); hold on;
+ scatter(comp_1_inh,comp_1_inh_2,'filled','MarkerFaceColor',[49, 96, 235]/255); hold on;
+ scatter(comp_2_act_1,comp_2_act,'filled','MarkerFaceColor',[227, 102, 102]/255); hold on;
+ scatter(biphasic_1,biphasic_2,'filled','MarkerFaceColor',[0, 173, 58]/255); hold on;
+legend("other","D glu inh ","Lipid glu act ","biphasic");
+ 
+
+ xlabel("fasted D glucose ");
+ ylabel("fasted L glucose ");
+ line([-5 5],[1 1],'Color','k','LineStyle','--')
+line([-1 -1],[-10 30],'Color','k','LineStyle','--')
+
+
+
+xlim([-5 5])
+ylim([-5 15])
+
+
+ line([-10 10],[0 0],'Color','k','LineStyle','-')
+line([0 0],[-10 30],'Color','k','LineStyle','-')
+
+
+line([-10 10],[10 -10],'Color','r','LineStyle','-')
+
+
+
+ x = comp_1;
+ y = comp_2;
+  
+mdl = fitlm(x,y)
+mdl.Rsquared.Ordinary
 
 %% classifier using decoder
 Data_mice_1 = [zscore_aligned_1; zscore_aligned_4];
@@ -543,6 +646,18 @@ Data_mice_3 = [zscore_aligned_3; zscore_aligned_6];
 y_label_3 = [ones(1,size(zscore_aligned_3,1)) zeros(1,size(zscore_aligned_6,1))];
 res_3 = Data_mice_3(:,bef:end);
 Data_mice_3_label=[res_3'; y_label_3];
+
+Data_mice_4 = [zscore_aligned_4; zscore_aligned_7];
+y_label_4 = [ones(1,size(zscore_aligned_4,1)) zeros(1,size(zscore_aligned_7,1))];
+res_4 = Data_mice_4(:,bef:end);
+Data_mice_4_label=[res_4'; y_label_4];
+
+
+Data_mice_5 = [zscore_aligned_5; zscore_aligned_10];
+y_label_5 = [ones(1,size(zscore_aligned_5,1)) zeros(1,size(zscore_aligned_10,1))];
+res_5 = Data_mice_5(:,bef:end);
+Data_mice_5_label=[res_5'; y_label_5];
+
 
 
 
@@ -564,4 +679,57 @@ z(y_label_shuffle_id)=1;
 
 Data_mice_3_shuffled =[res_3'; z];
 
+y_label_shuffle_id = randsample(size(zscore_aligned_4,1)+size(zscore_aligned_7,1),size(zscore_aligned_4,1));
+z = zeros(1,size(zscore_aligned_4,1)+size(zscore_aligned_7,1));
+z(y_label_shuffle_id)=1;
 
+Data_mice_4_shuffled =[res_4'; z];
+
+
+
+y_label_shuffle_id = randsample(size(zscore_aligned_5,1)+size(zscore_aligned_1-,1),size(zscore_aligned_1-,1));
+z = zeros(1,size(zscore_aligned_5,1)+size(zscore_aligned_1-,1));
+z(y_label_shuffle_id)=1;
+
+Data_mice_5_shuffled =[res_5'; z];
+
+
+%% SVM- decoder time bin
+window = 5;
+accuracies=[];
+acc1 = svmDecoderTimebin(zscore_aligned_1,zscore_aligned_2,window);
+accuracies=[accuracies acc1];
+acc2 = svmDecoderTimebin(zscore_aligned_3,zscore_aligned_4,window);
+accuracies=[accuracies acc2];
+acc3 = svmDecoderTimebin(zscore_aligned_5,zscore_aligned_6,window);
+accuracies=[accuracies acc3];
+acc4 = svmDecoderTimebin(zscore_aligned_7,zscore_aligned_8,window);
+accuracies=[accuracies acc4];
+acc5 = svmDecoderTimebin(zscore_aligned_9,zscore_aligned_10,window);
+accuracies=[accuracies acc5];
+
+
+shuffle_accuracies=[];
+shuffle_acc1 = svmDecoderTimebinShuffle(zscore_aligned_1,zscore_aligned_2,window);
+shuffle_accuracies=[shuffle_accuracies shuffle_acc1];
+shuffle_acc2 = svmDecoderTimebinShuffle(zscore_aligned_3,zscore_aligned_4,window);
+shuffle_accuracies=[shuffle_accuracies shuffle_acc2];
+shuffle_acc3 = svmDecoderTimebinShuffle(zscore_aligned_5,zscore_aligned_6,window);
+shuffle_accuracies=[shuffle_accuracies shuffle_acc3];
+shuffle_acc4 = svmDecoderTimebinShuffle(zscore_aligned_7,zscore_aligned_8,window);
+shuffle_accuracies=[shuffle_accuracies shuffle_acc4];
+shuffle_acc5 = svmDecoderTimebinShuffle(zscore_aligned_9,zscore_aligned_10,window);
+shuffle_accuracies=[shuffle_accuracies shuffle_acc5];
+
+
+avgplot(accuracies',[14 84 165]/255,bef)
+ylabel('accuracy')
+title('Dglu-Lipid decoder accuracy');
+hold on;
+avgplot_2(shuffle_accuracies',[0.5 0.5 0.5],bef)
+ylabel('accuracy')
+xticks([0:12:156]);
+xticklabels(num2cell([-2:1:11]));
+title('Dglu-Lglu decoder shuffle accuracy');
+legend('Dglu vs Lglu','shuffled');
+ylim([30 100])

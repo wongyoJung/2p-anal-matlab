@@ -2,8 +2,8 @@
 Data_1_active=[]
 
 %% 
-firstLick_1 = floor(260*5);
-bef = 2*5*30;
+firstLick_1 = floor(120*5)+1;
+bef = 2*5*60;
 aft = 5*60*10;
 %% get z score and draw individual heatplot map 
 [zscore_1,zscore_norm_1] = zscoredraw(Data_1_active,bef,firstLick_1);
@@ -28,7 +28,7 @@ for j=1:size(zscore_aligned_1,1)
 
 end
 drawHM_aligned(empty_1,'zscore',bef,aft);
-title('G1-5-fed-Lglu-T2');
+title('G1-8-fed-Dglu-T2');
 
 %% classify by response
 inh_color = [0/255 86/255 191/255];

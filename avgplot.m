@@ -1,7 +1,6 @@
 function []= avgplot(array,color,start)
     mu = mean(array,1);
-    sig = std(array,1,1);
-     
+    sig = std(array,1,1)./sqrt(size(array,1));
     x=[1:size(array,2)];
     figure;
     shadedErrorBar(x,mu, sig,'lineprops',{'Color',color},'transparent',1);

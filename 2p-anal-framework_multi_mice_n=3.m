@@ -8,10 +8,7 @@ Data_3=[]
 Data_4=[]
 Data_5=[]
 Data_6=[]
-Data_7=[]
-Data_8=[]
-Data_9=[]
-Data_10=[]
+
 
 % firstLick, bef, aft should be in frame (hz)
 firstlicks=[]
@@ -43,21 +40,10 @@ zscore_aligned_5 = alignFirstLick(zscore_5,firstLicks(5),bef,aft);
 [zscore_6,zscore_norm_6] = zscoredraw(Data_6,bef,firstLicks(6));
 zscore_aligned_6 = alignFirstLick(zscore_6,firstLicks(6),bef,aft);
 
-[zscore_7,zscore_norm_7] = zscoredraw(Data_7,bef,firstLicks(7));
-zscore_aligned_7 = alignFirstLick(zscore_7,firstLicks(7),bef,aft);
-
-[zscore_8,zscore_norm_8] = zscoredraw(Data_8,bef,firstLicks(8));
-zscore_aligned_8 = alignFirstLick(zscore_8,firstLicks(8),bef,aft);
-
-[zscore_9,zscore_norm_9] = zscoredraw(Data_9,bef,firstLicks(9));
-zscore_aligned_9 = alignFirstLick(zscore_9,firstLicks(9),bef,aft);
-
-[zscore_10,zscore_norm_10] = zscoredraw(Data_10,bef,firstLicks(10));
-zscore_aligned_10 = alignFirstLick(zscore_10,firstLicks(10),bef,aft);
 
 
-Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5; zscore_aligned_7; zscore_aligned_9];
-Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6; zscore_aligned_8; zscore_aligned_10];
+Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5];
+Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6];
 
 drawHM_aligned(Data_SO,'zscore',bef,aft);
 title('Dglu');
@@ -93,11 +79,15 @@ zscore_aligned_6 = alignFirstLick(zscore_norm_6,firstLicks(6),bef,aft);
 Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5];
 Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6];
 
-drawHM_aligned(Data_SA,'zscore',bef,aft);
-title('Lipid');
 
 drawHM_aligned(Data_SO,'zscore',bef,aft);
-title('Dglu');
+title('Fasted-Dfructose');
+
+
+drawHM_aligned(Data_SA,'zscore',bef,aft);
+title('Fasted-Lglu');
+
+
 
 %% divide into k means
 
@@ -147,7 +137,7 @@ for j=1:size(Data_SO,1)
     empty_2(sorted_ind,:)=cell_2;
 end
 drawHM_aligned(empty_1,'zscore',bef,aft);
-title('Fasted D glucose');
+title('Fasted D-fructose');
 drawHM_aligned(empty_2,'zscore',bef,aft);
 title('Fasted Lglucose');
 
@@ -451,7 +441,7 @@ end
 clust_act=[]
 clust_inh=[]
 clust_no_res=[]
-[clust_act,clust_inh,clust_no_res] = responsiveCell(SO_inh_match,bef,aft);
+[clust_act,clust_inh,clust_no_res] = responsiveCell(SO_act_match,bef,aft);
 if(length(clust_act))
     avgplot(clust_act,act_color,bef)
 end
