@@ -16,7 +16,7 @@ firstlicks=[]
 
 % bef = 3*60*5;
 bef = 5*60*2;
-aft = 5*60*10;
+aft = 5*60*11;
 % aft = 5*60*5;
 
 %% pick common active cells
@@ -44,6 +44,8 @@ zscore_aligned_6 = alignFirstLick(zscore_6,firstLicks(6),bef,aft);
 
 Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5];
 Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6];
+
+
 
 drawHM_aligned(Data_SO,'zscore',bef,aft);
 title('Dglu');

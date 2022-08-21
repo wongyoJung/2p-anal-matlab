@@ -1,8 +1,5 @@
-function [clust1,clust2,clust3,clust4] = getResponsiveSort(data1,data2,bef)
-clust1=[];
-clust2=[];
-clust3=[];
-clust4=[];
+function [data1_clust1,data1_clust2, data1_clust3, data1_clust4,data2_clust1,data2_clust2, data2_clust3, data2_clust4 ] = getResponsiveSort(data1,data2,bef)
+
 % clust 1 : data1 inh and data2 activated
 % clust2 : data1 inh and data2 not act
 % clust 3: data 1 not inh and data2 act
@@ -10,10 +7,32 @@ clust4=[];
 
 res1 = mean(data1(:,bef:end),2);
 res2 = mean(data2(:,bef:end),2);
+
 clust1_idx = find(res1<=-1 & res2>=1);
 clust2_idx = find(res1<=-1 & res2<1);
 clust3_idx = find(res1>-1 & res2>=1);
 clust4_idx = find(res1>-1 & res2<1);
+% 
+% data1_clust1 = mean(data1(clust1_idx,bef:bef+10*5*60),2);
+% data1_clust2 = mean(data1(clust2_idx,bef:bef+10*5*60),2);
+% data1_clust3 = mean(data1(clust3_idx,bef:bef+10*5*60),2);
+% data1_clust4 = mean(data1(clust4_idx,bef:bef+10*5*60),2);
+% 
+% data2_clust1 = mean(data2(clust1_idx,bef:bef+10*5*60),2);
+% data2_clust2 = mean(data2(clust2_idx,bef:bef+10*5*60),2);
+% data2_clust3 = mean(data2(clust3_idx,bef:bef+10*5*60),2);
+% data2_clust4 = mean(data2(clust4_idx,bef:bef+10*5*60),2);
+
+
+data1_clust1 = data1(clust1_idx,bef:bef+10*5*60);
+data1_clust2 = data1(clust2_idx,bef:bef+10*5*60);
+data1_clust3 = data1(clust3_idx,bef:bef+10*5*60);
+data1_clust4 = data1(clust4_idx,bef:bef+10*5*60);
+
+data2_clust1 = data2(clust1_idx,bef:bef+10*5*60),2;
+data2_clust2 = data2(clust2_idx,bef:bef+10*5*60),2;
+data2_clust3 = data2(clust3_idx,bef:bef+10*5*60),2;
+data2_clust4 = data2(clust4_idx,bef:bef+10*5*60),2;
 
 %% draw pie
 population = [size(clust1_idx,1); size(clust2_idx,1); size(clust3_idx,1); size(clust4_idx,1)];

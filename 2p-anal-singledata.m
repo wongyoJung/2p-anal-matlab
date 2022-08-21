@@ -1,16 +1,16 @@
-
-Data_1_active=[]
-
-%% 
-firstLick_1 = floor(120*5)+1;
-bef = 2*5*60;
+%% parameter set
+startof = 150;
+firstLick_1 = floor(startof*5)+1;
+bef = 2*5*60; 
+% x min before
 aft = 5*60*10;
+% x min after / 5Hz ±‚¡ÿ
 %% get z score and draw individual heatplot map 
 [zscore_1,zscore_norm_1] = zscoredraw(Data_1_active,bef,firstLick_1);
 zscore_aligned_1 = alignFirstLick(zscore_1,firstLick_1,bef,aft);
 
 drawHM_aligned(zscore_aligned_1,'zscore',bef,aft);
-title('Data1');
+title('G16-0628-fasted-dglu30%');
 
 %% sort by avg
 
@@ -28,9 +28,9 @@ for j=1:size(zscore_aligned_1,1)
 
 end
 drawHM_aligned(empty_1,'zscore',bef,aft);
-title('G1-8-fed-Dglu-T2');
+title('G16-0628-fasted-Lglu30%');
 
-%% classify by response
+%% classify by response 
 inh_color = [0/255 86/255 191/255];
 act_color = [255/255, 73/255, 56/255];
 no_res_color = [0.5 0.5 0.5];

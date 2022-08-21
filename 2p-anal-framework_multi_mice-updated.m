@@ -59,6 +59,8 @@ zscore_aligned_10 = alignFirstLick(zscore_10,firstLicks(10),bef,aft);
 Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5; zscore_aligned_7; zscore_aligned_9];
 Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6; zscore_aligned_8; zscore_aligned_10];
 
+
+
 drawHM_aligned(Data_SO,'zscore',bef,aft);
 title('Dglu');
 
@@ -90,8 +92,8 @@ zscore_aligned_6 = alignFirstLick(zscore_norm_6,firstLicks(6),bef,aft);
 
 
 
-Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5];
-Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6];
+Data_SO = [zscore_aligned_1; zscore_aligned_3; zscore_aligned_5; zscore_aligned_7; zscore_aligned_9];
+Data_SA = [zscore_aligned_2; zscore_aligned_4; zscore_aligned_6; zscore_aligned_8; zscore_aligned_10];
 
 drawHM_aligned(Data_SA,'zscore',bef,aft);
 title('L-glucose');
@@ -100,10 +102,21 @@ drawHM_aligned(Data_SO,'zscore',bef,aft);
 title('D-glucose');
 
 %% divide into k means
-sortKmeans_multi_eval(Data_SO,Data_SA,bef,aft);
+sortKmeans_multi_eval(Data_SA,Data_SO,bef,aft);
+sortKmeans_multi_eval_2(Data_SO,Data_SA,bef,aft);
+sortKmeans_multi_eval_2(Data_SO,Data_SA,bef,aft);
+sortKmeans_multi_eval_4(Data_SA,Data_SO,bef,aft);
+
 
 %% divid according to resp
-getResponsiveSort(Data_SO,Data_SA,bef);
+[data1_clust1,data1_clust2, data1_clust3, data1_clust4,data2_clust1,data2_clust2, data2_clust3, data2_clust4 ] = getResponsiveSort(Data_SO,Data_SA,bef);
+data1_mean1 = data1_clust1(bef:bef+10*5*60);
+
+%% tuning preference curve
+tuningPreference(Data_SO,Data_SA,bef);
+tuningPreference2(Data_SO,Data_SA,bef);
+
+ylabel('Percent of cells (%)');
 %%
 
 [zscore_aligned_1_sorted,clust1_1,clust2_1,clust3_1,idx_1] = sortKmeans_multi(Data_SO,bef);
@@ -392,7 +405,7 @@ avgplot_2(clust3_2,inh_color,bef)
 
 
 %% draw pie chart from data 1
-[ses1_act, ses1_inh, ses1_nores] = getResponsive(empty_1,bef);
+[ses1_act, ses1_inh, ses1_nores] = getResponsive(Data_SO,bef);
 if(length(ses1_act))
     avgplot(ses1_act,act_color,bef)
 end
@@ -402,10 +415,7 @@ end
 if(length(ses1_nores))
     avgplot(ses1_nores,no_res_color,bef)
 end
-drawHM_aligned(ses1_act,'zscore',bef,aft);
-drawHM_aligned(ses1_nores,'zscore',bef,aft);
-drawHM_aligned(ses1_inh,'zscore',bef,aft);
-
+drawpie(ses1_act,ses1_inh,ses1_nores);
 
 
 
@@ -507,7 +517,7 @@ XX = norm_X;
 YY = Y';
 [b dev] = glmfit(XX,YY,'binomial','link','logit')
 % yfit = glmval(b,norm_X);
-yfit = glmval(b,XX,'logit' );
+yfit = glmval(b,XX,'logit');
 figure;
 plot(YY,'o');
 figure;
@@ -732,4 +742,140 @@ xticks([0:12:156]);
 xticklabels(num2cell([-2:1:11]));
 title('Dglu-Lglu decoder shuffle accuracy');
 legend('Dglu vs Lglu','shuffled');
-ylim([30 100])
+ylim([30 100]);
+
+%% 
+window = 5;
+% all
+[acc_all] = svmDecoderTimebin(Data_SO(:,bef:bef+5*60*10),Data_SA(:,bef:bef+5*60*10),window);
+% w.o clust1
+d1 = [data1_clust2; data1_clust3; data1_clust4];
+d2 = [data2_clust2; data2_clust3; data2_clust4];
+[acc_wo1] = svmDecoderTimebin(d1,d2,window);
+
+%w.o clust2
+d1 = [data1_clust1; data1_clust3; data1_clust4];
+d2 = [data2_clust1;  data2_clust3; data2_clust4];
+[acc_wo2] = svmDecoderTimebin(d1,d2,window);
+
+% w.o clust3
+d1 = [data1_clust1; data1_clust2; data1_clust4];
+d2 = [data2_clust1; data2_clust2; data2_clust4];
+[acc_wo3] = svmDecoderTimebin(d1,d2,window);
+
+% w.o clust4
+d1 = [data1_clust1; data1_clust2; data1_clust3];
+d2 = [data2_clust1; data2_clust2; data2_clust3];
+[acc_wo4] = svmDecoderTimebin(d1,d2,window);
+startof = 0;
+endof = 2;
+accs = [mean(acc_all(startof*60/window+1:endof*60/5));mean(acc_wo1(startof*60/window+1:endof*60/5));
+    mean(acc_wo2(startof*60/window+1:endof*60/5));
+    mean(acc_wo3(startof*60/window+1:endof*60/5));mean(acc_wo4(startof*60/window+1:endof*60/5));]
+figure;
+bar(acc_all); hold on;
+bar(acc_wo1); hold on;
+bar(acc_wo2); hold on;
+bar(acc_wo3); hold on;
+bar(acc_wo4); hold on;
+legend
+
+
+%%
+[acc_] = svmDecoderTimebin(d1,d2,window);
+[acc_wo4] = svmDecoderTimebin(d1,d2,window);
+[acc_wo4] = svmDecoderTimebin(d1,d2,window);
+[acc_wo4] = svmDecoderTimebin(d1,d2,window);
+
+
+%%
+startof = 0;
+endof = 10;
+accs=[];
+for c=1:size(Data_SO,1)
+    acc=0;
+    cell1 = Data_SO(c,startof*5*60+1:endof*5*60);
+    cell2 = Data_SA(c,startof*5*60+1:endof*5*60);
+%    acc = svmDecoderTimebin(cell1,cell2,window);
+    x = [cell1;cell2];
+    Y = {'Dglu';'Lipid'};
+    SVMModel = fitcecoc(x,Y);
+    CVMdl =  crossval(SVMModel,'leaveout','on');
+    predicted = kfoldPredict(CVMdl);
+    for j=1:length(predicted)
+        comp = strcmp(predicted{j},Y{j});
+        acc = acc+comp;
+    end
+    acc = acc/length(predicted)*100;
+    accs=[accs; acc];
+end
+
+%% 
+acc_clust1 = svmDecoderTimebin_clust(zscore_aligned_1,zscore_aligned_2,bef,window);
+acc_clust2 = svmDecoderTimebin_clust(zscore_aligned_3,zscore_aligned_4,bef,window);
+acc_clust3 = svmDecoderTimebin_clust(zscore_aligned_5,zscore_aligned_6,bef,window);
+acc_clust4 = svmDecoderTimebin_clust(zscore_aligned_7,zscore_aligned_8,bef,window);
+acc_clust5 = svmDecoderTimebin_clust(zscore_aligned_9,zscore_aligned_10,bef,window);
+acc_clusters = [acc_clust1; acc_clust2; acc_clust3; acc_clust4; acc_clust5];
+% 
+% acc_all1 = svmDecoderTimebin(zscore_aligned_1,zscore_aligned_2,window);
+% acc_all2 = svmDecoderTimebin(zscore_aligned_3,zscore_aligned_4,window);
+% acc_all3 = svmDecoderTimebin(zscore_aligned_5,zscore_aligned_6,window);
+% acc_all4 = svmDecoderTimebin(zscore_aligned_7,zscore_aligned_8,window);
+% acc_all5 = svmDecoderTimebin(zscore_aligned_9,zscore_aligned_10,window);
+
+acc_all1 = svmDecoderTimebin_whole(zscore_aligned_1,zscore_aligned_2,window);
+acc_all2 = svmDecoderTimebin_whole(zscore_aligned_3,zscore_aligned_4,window);
+acc_all3 = svmDecoderTimebin_whole(zscore_aligned_5,zscore_aligned_6,window);
+acc_all4 = svmDecoderTimebin_whole(zscore_aligned_7,zscore_aligned_8,window);
+acc_all5 = svmDecoderTimebin_whole(zscore_aligned_9,zscore_aligned_10,window);
+acc_all = [mean(acc_all1); mean(acc_all2); mean(acc_all3); mean(acc_all4); mean(acc_all5)];
+
+%% without specific clusters
+
+acc_clust1 = svmDecoderTimebin_clust_wo(zscore_aligned_1,zscore_aligned_2,bef,window);
+acc_clust2 = svmDecoderTimebin_clust_wo(zscore_aligned_3,zscore_aligned_4,bef,window);
+acc_clust3 = svmDecoderTimebin_clust_wo(zscore_aligned_5,zscore_aligned_6,bef,window);
+acc_clust4 = svmDecoderTimebin_clust_wo(zscore_aligned_7,zscore_aligned_8,bef,window);
+acc_clust5 = svmDecoderTimebin_clust_wo(zscore_aligned_9,zscore_aligned_10,bef,window);
+acc_clusters = [acc_clust1; acc_clust2; acc_clust3; acc_clust4; acc_clust5];
+
+acc_all1 = svmDecoderTimebin(zscore_aligned_1,zscore_aligned_2,window);
+acc_all2 = svmDecoderTimebin(zscore_aligned_3,zscore_aligned_4,window);
+acc_all3 = svmDecoderTimebin(zscore_aligned_5,zscore_aligned_6,window);
+acc_all4 = svmDecoderTimebin(zscore_aligned_7,zscore_aligned_8,window);
+acc_all5 = svmDecoderTimebin(zscore_aligned_9,zscore_aligned_10,window);
+acc_all = [mean(acc_all1); mean(acc_all2); mean(acc_all3); mean(acc_all4); mean(acc_all5)];
+
+%%
+acc_clust1 = svmDecoderTimebin_clust(zscore_aligned_1,zscore_aligned_2,bef,window);
+acc_clust2 = svmDecoderTimebin_clust(zscore_aligned_3,zscore_aligned_4,bef,window);
+acc_clust3 = svmDecoderTimebin_clust(zscore_aligned_5,zscore_aligned_6,bef,window);
+acc_clust4 = svmDecoderTimebin_clust(zscore_aligned_7,zscore_aligned_8,bef,window);
+acc_clust5 = svmDecoderTimebin_clust(zscore_aligned_9,zscore_aligned_10,bef,window);
+
+cluster1_accuracies = [acc_clust1(:,1) acc_clust2(:,1) acc_clust3(:,1) acc_clust4(:,1) acc_clust5(:,1)];
+cluster1_accuracies_filtered = addClust(cluster1_accuracies);
+
+cluster2_accuracies = [acc_clust1(:,2) acc_clust2(:,2) acc_clust3(:,2) acc_clust4(:,2) acc_clust5(:,2)];
+cluster2_accuracies_filtered = addClust(cluster2_accuracies);
+
+cluster3_accuracies = [acc_clust1(:,3) acc_clust2(:,3) acc_clust3(:,3) acc_clust4(:,3) acc_clust5(:,3)];
+cluster3_accuracies_filtered = addClust(cluster3_accuracies);
+
+cluster4_accuracies = [acc_clust1(:,4) acc_clust2(:,4) acc_clust3(:,4) acc_clust4(:,4) acc_clust5(:,4)];
+cluster4_accuracies_filtered = addClust(cluster4_accuracies);
+
+avgplot_2(cluster1_accuracies_filtered',[50, 168, 82]/255,bef);
+hold on;
+avgplot_2(cluster2_accuracies_filtered',[14 84 165]/255,bef);
+hold on;
+avgplot_2(cluster3_accuracies_filtered',[204, 62, 57]/255,bef);
+hold on;
+avgplot_2(cluster4_accuracies_filtered',[122 122 122]/255,bef);
+
+ylabel('accuracy')
+title('Dglu-Lipid decoder accuracy');
+
+xticks([0:12:156]);
+xticklabels(num2cell([-2:1:11]));

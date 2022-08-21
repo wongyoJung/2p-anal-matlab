@@ -186,6 +186,7 @@ figure;
 hold on
 plot(comp_SO,yCalc1)
 Rsq1 = 1 - sum((comp_SA - yCalc1).^2)/sum((comp_SA - mean(comp_SA)).^2)
+ylim([-4,4])
 
 %% scatter plot 
 comparison=[]
@@ -298,9 +299,6 @@ SO_nores=[]
 SO_inh_match=[]
 SO_act_match=[]
 SO_nores_match=[]
-
-
-
 SA_inh=[]
 SA_act=[]
 SA_nores=[]
@@ -444,10 +442,6 @@ for c = 1:size(Data_SO,1)
 
     end
 end
-
- 
-
-
 clust_act=[]
 clust_inh=[]
 clust_no_res=[]
@@ -512,7 +506,6 @@ s = size(norm_X,1);
 SO_norm_X=norm_X(1:s/2,:);
 SA_norm_X=norm_X(s/2:s,:);
 
-
 Y_SO = SO_norm_X*pc3;
 Y_SA = SA_norm_X*pc3;
 
@@ -527,6 +520,7 @@ xlabel("1st principle axis");ylabel("2nd principle axis");zlabel("3rd principle 
 figure;
 Y_tsne = tsne(norm_X);
 gscatter(Y_tsne(:,1),Y_tsne(:,2),Y)
+
 
 %% classifier using decoder
 Data_mice_1 = [zscore_aligned_1; zscore_aligned_4];
