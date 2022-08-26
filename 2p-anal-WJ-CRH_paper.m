@@ -22,8 +22,14 @@ firstlicks=[]
 bef = 5*60*2;
 aft = 5*60*11;
 
-%% get Z-score from the responses of each mice & align to the first lick;
+%% get Z-score from the responses of each mice & align to the first lick
 % draw heatmap plot of stimulus 1 (eg. SO), stimulus 2 (eg.SA)
+% you can draw calcium trace of individual cells (ex Fig 3C) by manually picking the
+% cell and command like this.
+
+% caclium_trace = zscore_1(i); %i is the index of the selected cells
+% figure; plot(caclium_trace);
+
 firstLicks=floor(firstlicks*5);
 
 [zscore_1,zscore_norm_1] = zscoredraw(Data_1,bef,firstLicks(1));
@@ -68,7 +74,7 @@ drawHM_aligned(Data_SA,'zscore',bef,aft);
 title('Lipid');
 
 
-%% sort by average & draw heatmap ex) Fig 3B
+%% sort by average & draw heatmap ex) Fig S3C
 zscore_avg_1 = mean(Data_SO(:,bef+1:end),2);
 zscore_avg_2 = mean(Data_SA(:,bef+1:end),2);
 
@@ -94,7 +100,7 @@ drawHM_aligned(empty_2,'zscore',bef,aft);
 title('Fasted Protein');
 
 
-%% divide into k means & draw each heatmap and pie graph; ex) Fig 3D, 3G
+%% divide into k means & draw each heatmap and pie graph; ex) Fig 3B, 3D
 sortKmeans_multi_eval(Data_SA,Data_SO,bef,aft);
 
 
@@ -107,7 +113,7 @@ sortKmeans_multi_eval(Data_SA,Data_SO,bef,aft);
 [data1_clust1,data1_clust2, data1_clust3, data1_clust4,data2_clust1,data2_clust2, data2_clust3, data2_clust4 ] = getResponsiveSort(Data_SO,Data_SA,bef);
 data1_mean1 = data1_clust1(bef:bef+10*5*60);
 
-%% tuning preference curve
+%% tuning preference curve; ex) Fig 3J
 tuningPreference(Data_SO,Data_SA,bef);
 ylabel('Percent of cells (%)');
 
@@ -159,7 +165,7 @@ scatter(x,y,'red')
 
 
 
-%% divide by average reponse to two different stimuli
+%% divide by average reponse to two different stimuli; ex) Fig S3A
 SO_inh=[]
 SO_act=[]
 SO_nores=[]
